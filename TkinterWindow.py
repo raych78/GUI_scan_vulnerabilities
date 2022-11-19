@@ -1,5 +1,8 @@
 from tkinter import *
+from tkinter import ttk
+import tkinter
 import xss_scanner
+import dos_attack
 
 class App(Tk):
 	def __init__(self, *args, **kwargs):
@@ -39,7 +42,7 @@ class StartPage(Frame):
 		
 
 		#Gif 
-		frameCnt = 12
+		frameCnt = 17
 		frames = [PhotoImage(file="GUI_scan_vulnerabilities/CompleteFrenchBluejay-size_restricted.gif", format = 'gif -index %i' %(i)) for i in range(frameCnt)]
 		def update(ind):
 			frame = frames[ind]
@@ -102,6 +105,50 @@ class PageTwo(Frame):
 	def __init__(self, parent, controller):
 		Frame.__init__(self, parent)
 		self.configure(background='black')
+
+		dos_frame = ttk.Frame(self, width=10000, height=100000,)
+		dos_frame.pack(side ="top",padx=30, pady=30, anchor="w")
+
+		dos_frame_result = ttk.Frame(self, width=10000, height=100)
+		dos_frame_result.pack(side ="top",padx=30, pady=60, anchor="w")
+		
+# Enrengistrement des IP src et dest 
+		IP_Source = tkinter.StringVar()
+		IP_Destination = tkinter.StringVar()
+
+# @IP SOURCE
+		ip_source_label = ttk.Label(dos_frame, text="@IP SOURCE:")
+		ip_source_label.pack()
+
+		ip_source_entry = ttk.Entry(dos_frame, textvariable=IP_Source)
+		ip_source_entry.pack()
+		ip_source_entry.focus()
+
+# @IP DESTINATION
+
+		ip_destination_label = ttk.Label(dos_frame, text="@IP SOURCE:")
+		ip_destination_label.pack()
+
+		ip_destination_entry = ttk.Entry(dos_frame, textvariable=IP_Destination)
+		ip_destination_entry.pack()
+		ip_destination_entry.focus()
+
+#Definition de la fonction appelé par le bouton 
+
+		def OnClick_DOS():
+				dos_attack.DOS_ATTACK(IP_Source, IP_Destination)
+			
+
+
+# Lancement de l'attaque DOS avec le button
+		dos_button = ttk.Button(dos_frame, text="Lancement de l'attaque DOS", command=dos_attack.DOS_ATTACK)
+		dos_button.pack()
+
+#Affiche les résultats ici
+		result_label = ttk.Label(dos_frame_result, text="Vos resultats apparaîssent ici...")
+		result_label.pack()
+
+
 
 		label = Label(self, text="Page Two")
 		label.pack(padx=10, pady=10)
