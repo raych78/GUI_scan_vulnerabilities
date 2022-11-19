@@ -58,10 +58,8 @@ def submit_form(form_details, url, value):
         return requests.get(target_url, params=data)
 
 
-
 def scan_xss(url):
-    print("Lancement du scanner")
-    result = "lancement du scanner..."
+    print("Lancement du scnanner")
     forms = get_all_forms(url)
     print(f"[+] Detected {len(forms)} forms on {url}.")
     js_script = "<Script>alert('hi')</scripT>"
@@ -72,15 +70,13 @@ def scan_xss(url):
         form_details = get_form_details(form)
         content = submit_form(form_details, url, js_script).content.decode()
         if js_script in content:
-            result = ("XSS Detected on url")
-            result+= ("\n" +[*] Form details:")
-            qqch = form_details
-            result = "Le site est pas vulnérable aux failles xss ! "
+            print(f"[+] XSS Detected ! On {url}")
+            print(f"[*] Form details:")
+            pprint(form_details)
             is_vulnerable = True
             # won't break because we want to print available vulnerable forms
-        else : 
-            result = "Le site n'est pas vulnérable aux failles xss ! "
-    return result
+    return is_vulnerable
+
 
 
 

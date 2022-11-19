@@ -104,5 +104,3 @@ def scan_sql_injection(url):
                 print("[+] Form:")
                 pprint(form_details)
                 break
-
-scan_sql_injection("http://challenge01.root-me.org/web-serveur/ch19/?action=recherche")
