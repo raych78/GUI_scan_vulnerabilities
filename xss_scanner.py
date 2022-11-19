@@ -59,7 +59,7 @@ def submit_form(form_details, url, value):
 
 
 def scan_xss(url):
-    print("Lancement du scnanner")
+    print("Lancement du scanner")
     forms = get_all_forms(url)
     print(f"[+] Detected {len(forms)} forms on {url}.")
     js_script = "<Script>alert('hi')</scripT>"
