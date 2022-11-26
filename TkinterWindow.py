@@ -54,10 +54,6 @@ class StartPage(Frame):
 		label = Label(self, background="black")
 		label.pack()
 		self.after(0, update, 0)
-
-
-
-
 		page_one = Button(self, text="Pentest des vulnérabilités OWASP", command=lambda:controller.show_frame(PageOne))
 		page_one.pack()
 		page_two = Button(self, text="Pentest réseau ", command=lambda:controller.show_frame(PageTwo))
@@ -79,8 +75,13 @@ class PageOne(Frame):
 		frameXSS.place(x=30,y=30,height=250,width=500)
 		
 		frameSQL = LabelFrame(self, text = "Analyse des injections sql")
-		frameSQL.place(x=1100,y=30,height=250,width=500)
+		frameSQL.place(x=1700,y=30,height=250,width=500)
 		
+
+		frameBruteForceLogin = LabelFrame(self, text = "Analyse des failles du login")
+		frameBruteForceLogin.place(x=30,y=400,height=250,width=500)
+
+
 		labelXSS = Label(frameXSS, text = "les resultats des failles xss apparaissent ici...")
 		labelXSS.pack()
 		
@@ -109,8 +110,6 @@ class PageTwo(Frame):
 		dos_frame = ttk.Frame(self, width=10000, height=100000,)
 		dos_frame.pack(side ="top",padx=30, pady=30, anchor="w")
 
-		dos_frame_result = ttk.Frame(self, width=10000, height=100)
-		dos_frame_result.pack(side ="top",padx=30, pady=60, anchor="w")
 		
 # Enrengistrement des IP src et dest 
 		IP_Source = tkinter.StringVar()
@@ -136,16 +135,18 @@ class PageTwo(Frame):
 #Definition de la fonction appelé par le bouton 
 
 		def OnClick_DOS():
-				dos_attack.DOS_ATTACK(IP_Source, IP_Destination)
+				result_label.config(text="")
 			
 
+# Lancer et stopper l'attaque DOS avec le boutton
+		dos_button_start = ttk.Button(dos_frame, text="Lancer l'attaque DOS", command=OnClick_DOS)
+		dos_button_start.pack()
 
-# Lancement de l'attaque DOS avec le button
-		dos_button = ttk.Button(dos_frame, text="Lancement de l'attaque DOS", command=dos_attack.DOS_ATTACK)
-		dos_button.pack()
+		dos_button_stop = ttk.Button(dos_frame, text="Stopper l'attaque DOS", command=OnClick_DOS)
+		dos_button_stop.pack()
 
 #Affiche les résultats ici
-		result_label = ttk.Label(dos_frame_result, text="Vos resultats apparaîssent ici...")
+		result_label = ttk.Label(dos_frame, text="Vos resultats apparaîssent ici...")
 		result_label.pack()
 
 
