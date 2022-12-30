@@ -43,7 +43,7 @@ class StartPage(Frame):
 
 		#Gif 
 		frameCnt = 17
-		frames = [PhotoImage(file="GUI_scan_vulnerabilities/CompleteFrenchBluejay-size_restricted.gif", format = 'gif -index %i' %(i)) for i in range(frameCnt)]
+		frames = [PhotoImage(file="./hacker-pc.gif", format = 'gif -index %i' %(i)) for i in range(frameCnt)]
 		def update(ind):
 			frame = frames[ind]
 			ind += 1
@@ -136,6 +136,7 @@ class PageTwo(Frame):
 
 		def OnClick_DOS():
 				result_label.config(text="")
+				
 			
 
 # Lancer et stopper l'attaque DOS avec le boutton
