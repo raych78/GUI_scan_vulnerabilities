@@ -275,7 +275,7 @@ class PageFour(Frame):
 
 
 		PasswordHash_entry = ttk.Entry(framebruteforce, textvariable=PasswordHash)
-		PasswordHash_entry.pack()
+		PasswordHash_entry.pack(fill=X)
 		PasswordHash_entry.focus()
 
 #Start and End with
@@ -287,7 +287,7 @@ class PageFour(Frame):
 		StartWith_entry.focus()
 
 
-		EndWith_label = ttk.Label(framebruteforce, text="Password starts with :")
+		EndWith_label = ttk.Label(framebruteforce, text="Password ends with :")
 		EndWith_label.pack()
 
 		EndWith_entry = ttk.Entry(framebruteforce, textvariable=EndWith)
@@ -317,6 +317,9 @@ class PageFour(Frame):
 
 		threadBF = threading.Thread()
 		threadOut = threading.Thread()
+		threadBF.setDaemon(True)
+		threadOut.setDaemon(True)
+
 		def startBF():
 			i= list_algo.curselection()
 			killing_queue.put(False)
