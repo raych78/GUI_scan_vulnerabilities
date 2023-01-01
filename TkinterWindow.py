@@ -1,11 +1,15 @@
 from tkinter import *
 from tkinter import ttk
 import tkinter
+import threading 
+import queue
 
 import requests
 import xss_scanner
 import dos_attack
 import tkinter.filedialog
+import HashedPassword_Attack
+
 
 class App(Tk):
 	def __init__(self, *args, **kwargs):
@@ -20,7 +24,7 @@ class App(Tk):
 
 		self.frames = {}
 
-		for F in (StartPage, PageOne, PageTwo):
+		for F in (StartPage, PageOne, PageTwo, PageFour):
 			frame = F(container, self)
 			self.frames[F] = frame
 			frame.grid(row=0, column=0, sticky="nsew")
@@ -62,7 +66,9 @@ class StartPage(Frame):
 		page_two = Button(self, text="Pentest réseau ", command=lambda:controller.show_frame(PageTwo))
 		page_two.pack()
 		page_three = Button(self,text="Pentest ingénierie social", command=lambda:controller.show_frame(PageThree))
-		page_three.pack()	
+		page_three.pack()
+		page_four = Button(self,text="Password cracker", command=lambda:controller.show_frame(PageFour))
+		page_four.pack()
 
 class PageOne(Frame):
 	def __init__(self, parent, controller):
@@ -239,6 +245,121 @@ class PageThree(Frame):
 		Frame.__init__(self, parent)
 		self.configure(background='black')
 
+		label = Label(self, text="Page Two")
+		label.pack(padx=10, pady=10)
+		start_page = Button(self, text="Start Page", command=lambda:controller.show_frame(StartPage))
+		start_page.pack()
+		page_one = Button(self, text="Page One", command=lambda:controller.show_frame(PageOne))
+		page_one.pack()
+
+class PageFour(Frame):
+	def __init__(self, parent, controller):
+		Frame.__init__(self, parent)
+		self.configure(background='black')
+
+		#dos_frame = ttk.Frame(self, width=10000, height=100000,)
+		#dos_frame.pack(side ="top",padx=30, pady=30, anchor="w")
+
+		framebruteforce = LabelFrame(self, text = "Bruteforce hash")
+		framebruteforce.place(x=30,y=30,height=700,width=500)
+#Base
+		PasswordHash = StringVar()
+		StartWith = StringVar()
+		EndWith = StringVar()
+		PasswordLength = IntVar()
+
+
+#Hash
+		PasswordHash_label = ttk.Label(framebruteforce, text="Hash cible* :")
+		PasswordHash_label.pack()
+
+
+		PasswordHash_entry = ttk.Entry(framebruteforce, textvariable=PasswordHash)
+		PasswordHash_entry.pack()
+		PasswordHash_entry.focus()
+
+#Start and End with
+		StartWith_label = ttk.Label(framebruteforce, text="Password starts with :")
+		StartWith_label.pack()
+
+		StartWith_entry = ttk.Entry(framebruteforce, textvariable=StartWith)
+		StartWith_entry.pack()
+		StartWith_entry.focus()
+
+
+		EndWith_label = ttk.Label(framebruteforce, text="Password starts with :")
+		EndWith_label.pack()
+
+		EndWith_entry = ttk.Entry(framebruteforce, textvariable=EndWith)
+		EndWith_entry.pack()
+		EndWith_entry.focus()
+
+#Password length
+		PasswordLength_label = ttk.Label(framebruteforce, text="Total password length (0 if unknown)")
+		PasswordLength_label.pack()
+
+
+		PasswordLength_entry = ttk.Entry(framebruteforce, textvariable=PasswordLength)
+		PasswordLength_entry.pack()
+		PasswordLength_entry.focus()
+
+#Hash Algorithm
+		Label_choose_algo = Label(framebruteforce, text = "Select an algorythm*")
+		Label_choose_algo.pack()
+
+		Algorithms_choices = ['mdc2', 'whirlpool', 'sha224', 'blake2b', 'sha512', 'shake_256', 'sha512_224', 'sha3_256', 'sha512_256', 'shake_128','blake2s', 'md5-sha1', 'md5', 'sha3_224', 'sha3_384', 'md4', 'sha256', 'sm3', 'sha384', 'sha1', 'ripemd160', 'sha3_512']
+		Algo = StringVar(value=Algorithms_choices)
+		list_algo = Listbox(framebruteforce, listvariable=Algo, selectmode=SINGLE)
+		list_algo.pack()
+#Definition de la fonction appelé par le bouton 
+		killing_queue = queue.Queue()
+		return_queue = queue.Queue()
+
+		threadBF = threading.Thread()
+		threadOut = threading.Thread()
+		def startBF():
+			i= list_algo.curselection()
+			killing_queue.put(False)
+
+			Arguments = [str(PasswordHash.get()),killing_queue,return_queue, int(PasswordLength.get()), str(StartWith.get()), str(EndWith.get()), str(list_algo.get(i))]
+			if Arguments[3]==0 : Arguments[3]=1
+			threadBF = threading.Thread(target=HashedPassword_Attack.bruteForce_Hash, args=Arguments)
+			threadBF.start()
+
+			threadOut = threading.Thread(target=DisplayOut)
+			threadOut.start()
+			return threadBF.name
+
+		
+		def stopBF():
+
+			killing_queue.put(True)
+			
+	
+# Launch and stop
+		Bruteforce_Start = ttk.Button(framebruteforce, text="Find Password", command=startBF)
+		Bruteforce_Start.pack()
+
+		Bruteforce_Stop = ttk.Button(framebruteforce, text="Stop", command=stopBF)
+		Bruteforce_Stop.pack()
+
+		global LabelOut
+
+		LabelOut = Label(framebruteforce, text="Waiting for orders")
+		LabelOut.pack()
+		def DisplayOut():
+			global LabelOut
+			while True:
+				try:
+					textOut = return_queue.get(timeout=5)
+					LabelOut.configure(text=textOut)
+					if textOut.startswith("Password"):
+						break
+
+				except queue.Empty:
+					pass
+
+			
 		label = Label(self, text="Page Two")
 		label.pack(padx=10, pady=10)
 		start_page = Button(self, text="Start Page", command=lambda:controller.show_frame(StartPage))
