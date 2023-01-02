@@ -391,57 +391,60 @@ class PageFive(Frame):
 		#dos_frame = ttk.Frame(self, width=10000, height=100000,)
 		#dos_frame.pack(side ="top",padx=30, pady=30, anchor="w")
 
-		framebruteforce = LabelFrame(self, text = "Bruteforce hash (* are mandatory, others are optionnal)")
-		framebruteforce.place(x=30,y=30,height=610,width=870)
+		framebruteforceDico = LabelFrame(self, text = "Bruteforce hash (* are mandatory, others are optionnal)")
+		framebruteforceDico.place(x=30,y=30,height=610,width=870)
 #Base
 		PasswordHash = StringVar()
-		StartWith = StringVar()
-		EndWith = StringVar()
-		PasswordLength = IntVar()
 
 
 #Hash
-		PasswordHash_label = ttk.Label(framebruteforce, text="Hash cible* :")
+		PasswordHash_label = ttk.Label(framebruteforceDico, text="Hash cible* :")
 		PasswordHash_label.pack()
 
 
-		PasswordHash_entry = ttk.Entry(framebruteforce, textvariable=PasswordHash)
+		PasswordHash_entry = ttk.Entry(framebruteforceDico, textvariable=PasswordHash)
 		PasswordHash_entry.pack(fill=X)
 		PasswordHash_entry.focus()
 
-#Start and End with
-		StartWith_label = ttk.Label(framebruteforce, text="Password starts with :")
-		StartWith_label.pack()
-
-		StartWith_entry = ttk.Entry(framebruteforce, textvariable=StartWith)
-		StartWith_entry.pack()
-		StartWith_entry.focus()
-
-
-		EndWith_label = ttk.Label(framebruteforce, text="Password ends with :")
-		EndWith_label.pack()
-
-		EndWith_entry = ttk.Entry(framebruteforce, textvariable=EndWith)
-		EndWith_entry.pack()
-		EndWith_entry.focus()
-
-#Password length
-		PasswordLength_label = ttk.Label(framebruteforce, text="Total password length (0 if unknown)")
-		PasswordLength_label.pack()
-
-
-		PasswordLength_entry = ttk.Entry(framebruteforce, textvariable=PasswordLength)
-		PasswordLength_entry.pack()
-		PasswordLength_entry.focus()
 
 #Hash Algorithm
-		Label_choose_algo = Label(framebruteforce, text = "Select an algorythm*")
+		Label_choose_algo = Label(framebruteforceDico, text = "Select an algorythm*")
 		Label_choose_algo.pack()
 
 		Algorithms_choices = ['md5', 'sha1', 'sha224', 'sha256', 'sha384', 'sha512', 'blake2b', 'blake2s','sha3_224', 'sha3_256', 'sha3_384', 'sha3_512', 'shake_128','shake_256']
 		Algo = StringVar(value=Algorithms_choices)
-		list_algo = Listbox(framebruteforce, listvariable=Algo, selectmode=SINGLE)
+		list_algo = Listbox(framebruteforceDico, listvariable=Algo, selectmode=SINGLE, exportselection=False)
 		list_algo.pack()
+
+		Label_choose_dico = Label(framebruteforceDico, text = "Select a dictionnary or open a file")
+		Label_choose_dico.pack()
+
+		dictionary_choices = ["2020-200_most_used_passwords", "default-passwords", "NordVPN"]
+		choicesvar = StringVar(value=dictionary_choices)
+		l_dico = Listbox(framebruteforceDico, listvariable=choicesvar, exportselection=False)
+		l_dico.pack()
+		global file_path
+
+		def open_file():
+			global file_path
+			file_path = tkinter.filedialog.askopenfilename()
+				
+
+		button_add_dico = Button(framebruteforceDico,text="Open File", command=open_file)
+		button_add_dico.pack()
+
+		def HashedDico():
+			j= l_dico.curselection()
+			if not "file_path" in locals() or l_dico.get(j) != file_path[13:len(file_path)-4]:
+				file_path=l_dico.get(j)
+				file_path="Dictionaries/"+file_path+".txt"
+				print("heu")	
+			i= list_algo.curselection()
+			HashedPassword_Attack.Dictionary_Hash(PasswordHash.get(), file_path, str(list_algo.get(i)))
+
+		button_see = Button(framebruteforceDico,text="test", command=HashedDico)
+		button_see.pack()
+
 
 class MainMenu:
 	def __init__(self, master):
