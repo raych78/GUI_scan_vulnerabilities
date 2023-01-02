@@ -363,20 +363,24 @@ class PageFour(Frame):
 				except queue.Empty:
 					pass
 
-		ToHash_label = ttk.Label(framebruteforce, text="\n \n \n Want to hash something? Fill in text and select the hash method up there")
+		ToHash_label = ttk.Label(framebruteforce, text="\n \n Want to hash something? Fill in text and select the hash method up there")
 		ToHash_label.pack()
 		
 
 		ToHash_entry = ttk.Entry(framebruteforce, textvariable=ToHash)
 		ToHash_entry.pack()
+		HashedPass_label = Text(framebruteforce, height=2, borderwidth=0)
 
 		def HashThishandler():
 			i= list_algo.curselection()
 			HashedPass = HashedPassword_Attack.HashThis(ToHash.get(),str(list_algo.get(i)))
-			HashedPass_label = Text(framebruteforce, height=1, borderwidth=0)
+
+			HashedPass_label.configure(state="normal")
+			HashedPass_label.delete(1.0, END)
 			HashedPass_label.insert(1.0, HashedPass)
-			HashedPass_label.pack()
 			HashedPass_label.configure(state="disabled")
+			HashedPass_label.pack()
+
 
 		StartHash = ttk.Button(framebruteforce, text="Hash", command=HashThishandler)
 		StartHash.pack()
@@ -419,26 +423,26 @@ class PageFive(Frame):
 		Label_choose_dico = Label(framebruteforceDico, text = "Select a dictionnary or open a file")
 		Label_choose_dico.pack()
 
-		dictionary_choices = ["2020-200_most_used_passwords", "default-passwords", "NordVPN"]
+		dictionary_choices = ["2020-200_most_used_passwords", "default-passwords", "NordVPN", "Custom..."]
 		choicesvar = StringVar(value=dictionary_choices)
 		l_dico = Listbox(framebruteforceDico, listvariable=choicesvar, exportselection=False)
 		l_dico.pack()
-		global file_path
-
 		def open_file():
 			global file_path
 			file_path = tkinter.filedialog.askopenfilename()
+
 				
 
 		button_add_dico = Button(framebruteforceDico,text="Open File", command=open_file)
 		button_add_dico.pack()
 
 		def HashedDico():
+			global file_path
 			j= l_dico.curselection()
 			if not "file_path" in locals() or l_dico.get(j) != file_path[13:len(file_path)-4]:
-				file_path=l_dico.get(j)
-				file_path="Dictionaries/"+file_path+".txt"
-				print("heu")	
+				if l_dico.get(j) != "Custom...":
+					file_path=l_dico.get(j)
+					file_path="Dictionaries/"+file_path+".txt"
 			i= list_algo.curselection()
 			HashedPassword_Attack.Dictionary_Hash(PasswordHash.get(), file_path, str(list_algo.get(i)))
 
