@@ -384,7 +384,7 @@ class PageFour(Frame):
 
 		StartHash = ttk.Button(framebruteforce, text="Hash", command=HashThishandler)
 		StartHash.pack()
-	#TODO add have I been pawned, Dico, Wifi, hasher
+	#TODO add have I been pawned, Wifi
 
 
 class PageFive(Frame):
@@ -395,14 +395,14 @@ class PageFive(Frame):
 		#dos_frame = ttk.Frame(self, width=10000, height=100000,)
 		#dos_frame.pack(side ="top",padx=30, pady=30, anchor="w")
 
-		framebruteforceDico = LabelFrame(self, text = "Bruteforce hash (* are mandatory, others are optionnal)")
+		framebruteforceDico = LabelFrame(self, text = "Dictionary hash")
 		framebruteforceDico.place(x=30,y=30,height=610,width=870)
 #Base
 		PasswordHash = StringVar()
 
 
 #Hash
-		PasswordHash_label = ttk.Label(framebruteforceDico, text="Hash cible* :")
+		PasswordHash_label = ttk.Label(framebruteforceDico, text="Hash cible :")
 		PasswordHash_label.pack()
 
 
@@ -412,7 +412,7 @@ class PageFive(Frame):
 
 
 #Hash Algorithm
-		Label_choose_algo = Label(framebruteforceDico, text = "Select an algorythm*")
+		Label_choose_algo = Label(framebruteforceDico, text = "Select an algorythm")
 		Label_choose_algo.pack()
 
 		Algorithms_choices = ['md5', 'sha1', 'sha224', 'sha256', 'sha384', 'sha512', 'blake2b', 'blake2s','sha3_224', 'sha3_256', 'sha3_384', 'sha3_512', 'shake_128','shake_256']
@@ -431,7 +431,12 @@ class PageFive(Frame):
 			global file_path
 			file_path = tkinter.filedialog.askopenfilename()
 
-				
+		return_queue_Dico = queue.Queue()	
+
+		global LabelOutDico
+
+		LabelOutDico = Label(framebruteforceDico, text="Waiting for orders")
+		LabelOutDico.pack()
 
 		button_add_dico = Button(framebruteforceDico,text="Open File", command=open_file)
 		button_add_dico.pack()
@@ -444,10 +449,23 @@ class PageFive(Frame):
 					file_path=l_dico.get(j)
 					file_path="Dictionaries/"+file_path+".txt"
 			i= list_algo.curselection()
-			HashedPassword_Attack.Dictionary_Hash(PasswordHash.get(), file_path, str(list_algo.get(i)))
+			HashedPassword_Attack.Dictionary_Hash(PasswordHash.get(), file_path, return_queue_Dico, str(list_algo.get(i)))
+			global LabelOutDico
+			while True:
+				try:
+					textOut = return_queue_Dico.get(timeout=5)
+					LabelOutDico.configure(text=textOut)
+					break
+				except queue.Empty:
+					pass
 
-		button_see = Button(framebruteforceDico,text="test", command=HashedDico)
-		button_see.pack()
+
+
+		button_Find = Button(framebruteforceDico,text="Search hash", command=HashedDico)
+		button_Find.pack()
+
+
+		
 
 
 class MainMenu:

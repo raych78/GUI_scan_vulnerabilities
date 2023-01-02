@@ -34,16 +34,15 @@ def bruteForce_Hash(password_hash,killing_queue,return_queue, length=1, startWit
 
 
 
-def Dictionary_Hash(password_hash, path, algorithm = "sha256"):
+def Dictionary_Hash(password_hash, path, return_queue_Dico, algorithm = "sha256"):
     with open(path,'r') as f:
         for p in f.readlines():
             p = p[:len(p)-1]
             #hash = hashlib.sha256(p.encode()).hexdigest()
             hash = HashThis(p,algorithm)
             if hash == password_hash:
-                print(p)
-                return p
-    print("nop")
+                return_queue_Dico.put("Password Found : "+p)
+    return_queue_Dico.put("Password not found in "+path)
 
 def HashThis(toHash, algorithm = "sha256"):
         return getattr(hashlib, algorithm)(toHash.encode()).hexdigest()
