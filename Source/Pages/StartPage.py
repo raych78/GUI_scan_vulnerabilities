@@ -37,8 +37,6 @@ class StartPage(Frame):
 		page_one.pack()
 		page_two = Button(self, text="Pentest réseau ", command=lambda:controller.show_frame(PentestReseau))
 		page_two.pack()
-		page_three = Button(self,text="Pentest ingénierie social", command=lambda:controller.show_frame(PageThree))
-		page_three.pack()
 		page_four = Button(self,text="Password cracker Bruteforce", command=lambda:controller.show_frame(BruteforceHash))
 		page_four.pack()
 		page_five = Button(self,text="Password cracker Dictionary", command=lambda:controller.show_frame(DicoHash))
