@@ -25,7 +25,7 @@ class BruteforceHash(Frame):
 
 
 #Hash
-		PasswordHash_label = ttk.Label(framebruteforce, text="Hash cible* :")
+		PasswordHash_label = ttk.Label(framebruteforce, text="Targeted Hash* :")
 		PasswordHash_label.pack()
 
 

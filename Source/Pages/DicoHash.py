@@ -21,7 +21,7 @@ class DicoHash(Frame):
 
 
 #Hash
-		PasswordHash_label = ttk.Label(framebruteforceDico, text="Hash cible :")
+		PasswordHash_label = ttk.Label(framebruteforceDico, text="Targeted Hash :")
 		PasswordHash_label.grid()
 
 
