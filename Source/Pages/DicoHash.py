@@ -1,7 +1,9 @@
 from tkinter import *
 from tkinter import ttk
-import tkinter
+from tkinter import filedialog
 import queue
+from os import listdir
+from os.path import isfile, join
 
 import Source.Scripts.HashedPassword_Attack as HashedPassword_Attack
 
@@ -42,13 +44,16 @@ class DicoHash(Frame):
 		Label_choose_dico = Label(framebruteforceDico, text = "Select a dictionnary or open a file")
 		Label_choose_dico.grid(column=1, row=2)
 
-		dictionary_choices = ["2020-200_most_used_passwords", "default-passwords", "NordVPN", "Custom..."]
+		Files = [f for f in listdir("Dictionaries/") if isfile(join("Dictionaries/", f))]
+		Files.append("Custom...")
+		dictionary_choices = Files
+		#dictionary_choices = ["2020-200_most_used_passwords", "default-passwords", "NordVPN", "Custom..."]
 		choicesvar = StringVar(value=dictionary_choices)
 		l_dico = Listbox(framebruteforceDico, listvariable=choicesvar, exportselection=False)
 		l_dico.grid(column=1, row=3)
 		def open_file():
 			global file_path
-			file_path = tkinter.filedialog.askopenfilename()
+			file_path = filedialog.askopenfilename()
 
 		return_queue_Dico = queue.Queue()	
 
@@ -63,10 +68,10 @@ class DicoHash(Frame):
 		def HashedDico():
 			global file_path
 			j= l_dico.curselection()
-			if not "file_path" in locals() or l_dico.get(j) != file_path[13:len(file_path)-4]:
+			if not "file_path" in locals() or l_dico.get(j) != file_path[13:len(file_path)]:
 				if l_dico.get(j) != "Custom...":
 					file_path=l_dico.get(j)
-					file_path="Dictionaries/"+file_path+".txt"
+					file_path="Dictionaries/"+file_path
 			i= list_algo.curselection()
 			HashedPassword_Attack.Dictionary_Hash(PasswordHash.get(), file_path, return_queue_Dico, str(list_algo.get(i)))
 			global LabelOutDico
@@ -95,10 +100,10 @@ class DicoHash(Frame):
 		def TestPawned():
 			global file_path
 			j= l_dico.curselection()
-			if not "file_path" in locals() or l_dico.get(j) != file_path[13:len(file_path)-4]:
+			if not "file_path" in locals() or l_dico.get(j) != file_path[13:len(file_path)]:
 				if l_dico.get(j) != "Custom...":
 					file_path=l_dico.get(j)
-					file_path="Dictionaries/"+file_path+".txt"
+					file_path="Dictionaries/"+file_path
 			
 			with open(file_path,'r') as f:
 				for p in f.readlines():
